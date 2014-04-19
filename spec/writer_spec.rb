@@ -1,53 +1,39 @@
 require 'spec_helper'
 require 'axlsx'
 require 'roo'
+require 'writer'
 
-describe 'Writing' do
-  it 'writes a correct file' do
-    filepath = 'templates/correct.xlsx'
-    notebook = "676-1-111"
+describe Writer do
+  describe '.create' do
+    it 'writes a correct file' do
+      options = {
+        product: 'Amichin',
+        analyst: 'S. Mallon',
+        limit: 1,
+        notebook: '676-1-111',
+        filepath: 'templates/correct.xlsx'
+      }
 
-    Axlsx::Package.new do |p|
-      spacer = ""
-
-      product = "Amichin"
-      analyst = "S. Mallon"
-      limit = 1
-
-      p.workbook.add_worksheet(:name => notebook) do |sheet|
-        sheet.add_row ["Product", product, spacer, "Analyst", analyst]
-        sheet.add_row ["Limit", limit, spacer, "Notebook", notebook]
-      end
-
-      p.serialize(filepath)
+      w = Writer.create(options)
+      t = Roo::Spreadsheet.open(options[:filepath])
+      expect(t.sheets.first).to eq(options[:notebook])
+      expect(t.cell(2, 5)).to eq(options[:notebook])
     end
 
-    t = Roo::Spreadsheet.open(filepath)
-    expect(t.sheets.first).to eq(notebook)
-  end
+    it 'writes an incorrect file' do
+      options = {
+        product: 'Amichin',
+        analyst: 'S. Mallon',
+        limit: 1,
+        notebook: '676-1-111',
+        filepath: 'templates/incorrect.xlsx'
+      }
+      other_notebook = "123-1-111"
 
-  it 'writes an incorrect file' do
-    filepath = 'templates/incorrect.xlsx'
-    notebook = "676-1-111"
-    other_notebook = "123-1-111"
-
-    Axlsx::Package.new do |p|
-      spacer = ""
-
-      product = "Amichin"
-      analyst = "S. Mallon"
-      limit = 1
-
-      p.workbook.add_worksheet(:name => notebook) do |sheet|
-        sheet.add_row ["Product", product, spacer, "Analyst", analyst]
-        sheet.add_row ["Limit", limit, spacer, "Notebook", other_notebook]
-      end
-
-      p.serialize(filepath)
+      w = Writer.create(options)
+      t = Roo::Spreadsheet.open(options[:filepath])
+      expect(t.sheets.first).to eq(options[:notebook])
+      expect(t.cell(2, 5)).to_not eq(other_notebook)
     end
-
-    t = Roo::Spreadsheet.open(filepath)
-    expect(t.sheets.first).to eq(notebook)
-    expect(t.cell(2, 5)).to eq(other_notebook)
   end
 end
