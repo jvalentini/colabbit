@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jvalentini/colabbit.svg?branch=master)](https://travis-ci.org/jvalentini/colabbit)
+
 # Colabbit
 
 TODO: Write a gem description
